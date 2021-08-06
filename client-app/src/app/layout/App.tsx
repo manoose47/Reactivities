@@ -8,6 +8,8 @@ import ActivityDashboard from '../../features/activities/dashboard/ActivityDashb
 function App() {
   // set a state when the component loads
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [selectedActivity, selectActivity] = useState<Activity | undefined>(undefined);
+  const [editMode, setEditMode] = useState(false);
 
   // useEffect will trigger each time the componnent loads
   // EXCEPT, we've added an empty array at the end, which means this useEffect will only run once.
@@ -18,11 +20,35 @@ function App() {
     })
   }, [])
 
+  function handleSelectActivity(id: string) {
+    selectActivity(activities.find(x => x.id == id));
+  }
+
+  function handleCancelActivity() {
+    selectActivity(undefined);
+  }
+
+  function handleFormOpen(id?: string) {
+    id ? handleSelectActivity(id) : handleCancelActivity();
+    setEditMode(true);
+  }
+
+  function handleFormClose() {
+    setEditMode(false);
+  }
+
   return (
     <Fragment>
-      <NavBar />
+      <NavBar openForm={handleFormOpen} />
       <Container style={{ marginTop: '7em' }}>
-        <ActivityDashboard activities={activities} />
+        <ActivityDashboard activities={activities}
+          selectedActivity={selectedActivity}
+          selectActivity={handleSelectActivity}
+          cancelActivity={handleCancelActivity}
+          openForm={handleFormOpen}
+          closeForm={handleFormClose}
+          editMode={editMode}
+        />
       </Container>
     </Fragment>
   );
