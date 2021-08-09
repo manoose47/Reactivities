@@ -1,9 +1,10 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
-import { Container, List } from 'semantic-ui-react';
+import { Container } from 'semantic-ui-react';
 import { Activity } from '../models/activity';
 import NavBar from './NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
+import {v4 as uuid} from 'uuid';
 
 function App() {
   // set a state when the component loads
@@ -21,7 +22,7 @@ function App() {
   }, [])
 
   function handleSelectActivity(id: string) {
-    selectActivity(activities.find(x => x.id == id));
+    selectActivity(activities.find(x => x.id === id));
   }
 
   function handleCancelActivity() {
@@ -37,6 +38,22 @@ function App() {
     setEditMode(false);
   }
 
+  function handleUpsertActivity(activity: Activity) {
+    // If activity is not null
+    // retrieve the remaining activities in the array and add the passed activity to the array
+    // else simply add the new activity to the existing activities array
+
+    activity.id ?
+    setActivities([...activities.filter(x => x.id !== activity.id), activity]) : setActivities([...activities, {...activity, id: uuid()}])
+    setEditMode(false);
+    selectActivity(activity);
+    console.log(activity);
+  }
+
+  function handleDeleteActivity(id: string) {
+    setActivities([...activities.filter(x => x.id !== id)]);
+  }
+
   return (
     <Fragment>
       <NavBar openForm={handleFormOpen} />
@@ -48,6 +65,8 @@ function App() {
           openForm={handleFormOpen}
           closeForm={handleFormClose}
           editMode={editMode}
+          upsertActivity={handleUpsertActivity}
+          deleteActivity={handleDeleteActivity}
         />
       </Container>
     </Fragment>

@@ -13,19 +13,21 @@ interface Props {
   openForm(id: string): void;
   closeForm(): void;
   editMode: boolean;
+  upsertActivity(activity: Activity) : void;
+  deleteActivity(id: string): void
 }
 
-export default function ActivityDashboard({ activities, selectActivity, cancelActivity, selectedActivity, editMode, openForm, closeForm }: Props) {
+export default function ActivityDashboard({ activities, selectActivity, cancelActivity, selectedActivity, editMode, openForm, closeForm, upsertActivity, deleteActivity }: Props) {
   return (
     <Grid>
       <Grid.Column width="10">
-        <ActivityList activities={activities} selectActivity={selectActivity} />
+        <ActivityList activities={activities} selectActivity={selectActivity} deleteActivity={deleteActivity} />
       </Grid.Column>
       <Grid.Column width="6">
         {selectedActivity && !editMode && <ActivityDetails activity={selectedActivity} cancelActivity={cancelActivity} openForm={openForm} />
         }
         {editMode &&
-          <ActivityForm closeForm={closeForm} activity={selectedActivity} />
+          <ActivityForm closeForm={closeForm} activity={selectedActivity} upsert={upsertActivity} />
         }
       </Grid.Column>
     </Grid>
