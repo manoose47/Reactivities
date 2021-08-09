@@ -1,10 +1,10 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import axios from 'axios';
 import { Container } from 'semantic-ui-react';
 import { Activity } from '../models/activity';
 import NavBar from './NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 import {v4 as uuid} from 'uuid';
+import agent from '../api/agent';
 
 function App() {
   // set a state when the component loads
@@ -15,9 +15,9 @@ function App() {
   // useEffect will trigger each time the componnent loads
   // EXCEPT, we've added an empty array at the end, which means this useEffect will only run once.
   useEffect(() => {
-    axios.get<Activity[]>('http://localhost:5000/api/activities').then(response => {
+    agent.Activities.list().then(response => {
       // running setActivities will update the state
-      setActivities(response.data);
+      setActivities(response);
     })
   }, [])
 
