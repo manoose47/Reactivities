@@ -41,7 +41,7 @@ export default function ActivityForm({ closeForm, activity, upsert }: Props) {
         <Form.Input placeholder="Title" name='title' value={formActivity.title} onChange={handleInputChange} />
         <Form.TextArea placeholder="Description" name='description' value={formActivity.description} onChange={handleInputChange} />
         <Form.Input placeholder="Category" name='category' value={formActivity.category} onChange={handleInputChange} />
-        <Form.Input placeholder="Date" name='date' value={formActivity.date} onChange={handleInputChange}/>
+        <Form.Input type="Date" placeholder="Date" name='date' value={formActivity.date} onChange={handleInputChange}/>
         <Form.Input placeholder="City" name='city' value={formActivity.city} onChange={handleInputChange} />
         <Form.Input placeholder="Venue" name='venue' value={formActivity.venue} onChange={handleInputChange} />
         <Button floated="right" positive type="submit" content="Submit" />

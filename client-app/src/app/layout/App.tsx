@@ -5,19 +5,25 @@ import NavBar from './NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 import {v4 as uuid} from 'uuid';
 import agent from '../api/agent';
+import LoadingComponent from './LoadingComponent';
+import { callbackify } from 'util';
 
 function App() {
   // set a state when the component loads
   const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedActivity, selectActivity] = useState<Activity | undefined>(undefined);
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  // useEffect will trigger each time the componnent loads
+  // useEffect will trigger each time the component loads
   // EXCEPT, we've added an empty array at the end, which means this useEffect will only run once.
   useEffect(() => {
     agent.Activities.list().then(response => {
+      response.forEach(x => { x.date = x.date.split('T')[0]})
       // running setActivities will update the state
       setActivities(response);
+      setLoading(false);
     })
   }, [])
 
@@ -43,6 +49,23 @@ function App() {
     // retrieve the remaining activities in the array and add the passed activity to the array
     // else simply add the new activity to the existing activities array
 
+    if(activity.id) {
+      agent.Activities.update(activity).then(
+        () => {
+          setActivities([...activities.filter(x => x.id !== activity.id), activity])
+          callback(activity)
+         }
+      )
+    } else {
+      activity.id = uuid();
+      agent.Activities.create(activity).then(
+        () => {
+          setActivities([...activities, activity])
+          callback(activity)
+        }
+      )
+    }
+
     activity.id ?
     setActivities([...activities.filter(x => x.id !== activity.id), activity]) : setActivities([...activities, {...activity, id: uuid()}])
     setEditMode(false);
@@ -53,6 +76,14 @@ function App() {
   function handleDeleteActivity(id: string) {
     setActivities([...activities.filter(x => x.id !== id)]);
   }
+
+  function callback(activity: Activity) {
+    setEditMode(false);
+    selectActivity(activity);
+    console.log(activity);
+  }
+
+  if (loading) return <LoadingComponent />
 
   return (
     <Fragment>
@@ -74,3 +105,5 @@ function App() {
 }
 
 export default App;
+
+
