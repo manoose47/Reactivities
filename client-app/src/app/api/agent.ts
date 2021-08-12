@@ -1,10 +1,9 @@
 import axios, { AxiosResponse } from 'axios';
-import { request } from 'http';
 import { Activity } from '../models/activity';
 
 axios.defaults.baseURL = 'http://localhost:5000/api';
 
-const responseBody = <T> (response: AxiosResponse<T>) => response.data;
+const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
     get: <T>(url: string) => axios.get<T>(url).then(responseBody),
@@ -22,9 +21,9 @@ const Activities = {
 }
 
 const sleep = (delay: number) => {
-return new Promise(resolve => {
-    setTimeout(resolve, delay)
-})
+    return new Promise(resolve => {
+        setTimeout(resolve, delay)
+    })
 }
 
 // implement delay to simulate real site performance
