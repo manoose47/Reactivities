@@ -1,30 +1,30 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Container } from 'semantic-ui-react';
+import { Button, Container } from 'semantic-ui-react';
 import { Activity } from '../models/activity';
 import NavBar from './NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 import { v4 as uuid } from 'uuid';
 import agent from '../api/agent';
 import LoadingComponent from './LoadingComponent';
+import { useStore } from '../stores/store';
+import { observer } from 'mobx-react-lite';
 
 function App() {
+
+  // retrieve the activity store from the store context
+  const {activityStore} = useStore();
+  
   // set a state when the component loads
   const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedActivity, selectActivity] = useState<Activity | undefined>(undefined);
   const [editMode, setEditMode] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   // useEffect will trigger each time the component loads
   // EXCEPT, we've added an empty array at the end, which means this useEffect will only run once.
   useEffect(() => {
-    agent.Activities.list().then(response => {
-      response.forEach(x => { x.date = x.date.split('T')[0] })
-      // running setActivities will update the state
-      setActivities(response);
-      setLoading(false);
-    })
-  }, [])
+    activityStore.loadActivities();
+  }, [activityStore])
 
   function handleSelectActivity(id: string) {
     selectActivity(activities.find(x => x.id === id));
@@ -83,13 +83,13 @@ function App() {
     setSubmitting(false);
   }
 
-  if (loading) return <LoadingComponent />
+  if (activityStore.loadgingInitial) return <LoadingComponent />
 
   return (
     <Fragment>
       <NavBar openForm={handleFormOpen} />
       <Container style={{ marginTop: '7em' }}>
-        <ActivityDashboard activities={activities}
+        <ActivityDashboard activities={activityStore.activities}
           selectedActivity={selectedActivity}
           selectActivity={handleSelectActivity}
           cancelActivity={handleCancelActivity}
@@ -105,6 +105,6 @@ function App() {
   );
 }
 
-export default App;
+export default observer(App);
 
 
