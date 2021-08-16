@@ -2,15 +2,14 @@ import React, { SyntheticEvent } from 'react';
 import { useState } from 'react';
 import { Button, Item, ItemContent, ItemDescription, ItemExtra, ItemHeader, ItemMeta, Label, Segment } from 'semantic-ui-react';
 import { Activity } from '../../../app/models/activity';
+import { useStore } from '../../../app/stores/store';
 
 interface Props {
-    activities: Activity[];
-    selectActivity: (id: string) => void;
     deleteActivity: (id: string) => void;
     submitting: boolean;
 }
 
-export default function ActivityList({ activities, selectActivity, deleteActivity, submitting }: Props) {
+export default function ActivityList({ deleteActivity, submitting }: Props) {
 
     const [target, setTarget] = useState('');
 
@@ -20,10 +19,12 @@ export default function ActivityList({ activities, selectActivity, deleteActivit
         deleteActivity(id);
     }
 
+    const {activityStore} = useStore();
+
     return (
         <Segment>
             <Item.Group divided>
-                {activities.map(activity => (
+                {activityStore.activities.map(activity => (
                     <Item key={activity.id}>
                         <ItemContent>
                             <ItemHeader as='a'>
@@ -37,7 +38,7 @@ export default function ActivityList({ activities, selectActivity, deleteActivit
                                 <div>{activity.city}, {activity.venue}</div>
                             </ItemDescription>
                             <ItemExtra>
-                                <Button floated='right' onClick={() => selectActivity(activity.id)} content='View' color='blue' />
+                                <Button floated='right' onClick={() => activityStore.selectActivity(activity.id)} content='View' color='blue' />
                                 <Button name={activity.id} floated='right' onClick={(e) => DeleteAction(e, activity.id)} loading={submitting && target === activity.id} content='Delete' color='red' />
                                 <Label basic content={activity.category}></Label>
                             </ItemExtra>

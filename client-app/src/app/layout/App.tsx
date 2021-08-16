@@ -26,23 +26,6 @@ function App() {
     activityStore.loadActivities();
   }, [activityStore])
 
-  function handleSelectActivity(id: string) {
-    selectActivity(activities.find(x => x.id === id));
-  }
-
-  function handleCancelActivity() {
-    selectActivity(undefined);
-  }
-
-  function handleFormOpen(id?: string) {
-    id ? handleSelectActivity(id) : handleCancelActivity();
-    setEditMode(true);
-  }
-
-  function handleFormClose() {
-    setEditMode(false);
-  }
-
   function handleUpsertActivity(activity: Activity) {
     // If activity is not null
     // retrieve the remaining activities in the array and add the passed activity to the array
@@ -83,19 +66,13 @@ function App() {
     setSubmitting(false);
   }
 
-  if (activityStore.loadgingInitial) return <LoadingComponent />
+  if (activityStore.loadingInitial) return <LoadingComponent />
 
   return (
     <Fragment>
-      <NavBar openForm={handleFormOpen} />
+      <NavBar />
       <Container style={{ marginTop: '7em' }}>
-        <ActivityDashboard activities={activityStore.activities}
-          selectedActivity={selectedActivity}
-          selectActivity={handleSelectActivity}
-          cancelActivity={handleCancelActivity}
-          openForm={handleFormOpen}
-          closeForm={handleFormClose}
-          editMode={editMode}
+        <ActivityDashboard
           upsertActivity={handleUpsertActivity}
           deleteActivity={handleDeleteActivity}
           submitting={submitting}
