@@ -4,7 +4,7 @@ import { Activity } from "../models/activity";
 import { v4 as uuid } from 'uuid';
 
 export default class ActivityStore {
-    activities: Activity[] = [];
+    activitiesRegistry = new Map<string, Activity>();
     selectedActivity: Activity | undefined = undefined;
     editMode =  false
     loading = false;
@@ -20,7 +20,7 @@ export default class ActivityStore {
             const response = await agent.Activities.list();
             response.forEach(x => { 
                 x.date = x.date.split('T')[0] 
-                this.activities.push(x);
+                this.activitiesRegistry.set(x.id, x)
             })
         } catch (error) {
             console.log(error);
@@ -34,19 +34,19 @@ export default class ActivityStore {
     }
 
     selectActivity = (id: string) => {
-        this.selectedActivity = this.activities.find(x => x.id === id);
+        this.selectedActivity = this.activitiesRegistry.get(id);
     }
     
-    cancelActivity(): void {
+    cancelActivity = () => {
         this.selectedActivity = undefined
     }
     
-    openForm(id?: string): void {
+    openForm = (id?: string) => {
         id ? this.selectActivity(id) : this.cancelActivity();
         this.editMode = true;
     }
     
-    closeForm() : void {
+    closeForm = () => {
         this.editMode = false;
     }
 
@@ -56,7 +56,7 @@ export default class ActivityStore {
             activity.id = uuid();
             await agent.Activities.create(activity);
             runInAction(()=> {
-                this.activities.push(activity);
+                this.activitiesRegistry.set(activity.id, activity);
             })
             this.postSubmitActivity(activity)
         } catch (error) {
@@ -70,12 +70,24 @@ export default class ActivityStore {
         try {
             await agent.Activities.update(activity);
             runInAction(()=> {
-                this.activities.filter(x => x.id !== activity.id);
-                this.activities.push(activity);
+                this.activitiesRegistry.set(activity.id, activity);
             })
             this.postSubmitActivity(activity)
         } catch (error) {
             console.log(error);
+            this.setLoading(false);
+        }
+    }
+
+    deleteActivity = async (id: string) => {
+        this.setLoading(true);
+        try {
+            await agent.Activities.delete(id)
+            runInAction(()=> {
+                this.activitiesRegistry.delete(id);
+                this.setLoading(false);
+            })
+        } catch (error) {
             this.setLoading(false);
         }
     }
@@ -91,5 +103,9 @@ export default class ActivityStore {
             this.selectActivity(activity.id);
         })
     }
+
+    get activitiesByDate()  { return Array.from(this.activitiesRegistry.values()).sort((a,b) => Date.parse(a.date) - Date.parse(b.date))}
+
+    
     
 }
