@@ -6,9 +6,9 @@ import { useStore } from "../../../app/stores/store";
 
 function ActivityForm() {
 
-  const {activityStore} = useStore();
+  const { activityStore } = useStore();
 
-  const {selectedActivity : activity, closeForm, updateActivity, createActivity, loading} = activityStore;
+  const { selectedActivity: activity, closeForm, updateActivity, createActivity, loading } = activityStore;
 
   const initialState = activity ?? {
     id: '',
@@ -25,7 +25,7 @@ function ActivityForm() {
 
 
   function handleSubmit() {
-    formActivity.id ? updateActivity(formActivity): createActivity(formActivity);
+    formActivity.id ? updateActivity(formActivity) : createActivity(formActivity);
   }
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
